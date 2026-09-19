@@ -46,10 +46,23 @@ def show_last_alert() -> None:
         console.print("[yellow]No alerts yet.[/yellow]")
         return
     data = json.loads(LAST_ALERT_PATH.read_text(encoding="utf-8"))
+    location = data.get("location") or "unknown"
+    isp = data.get("isp") or data.get("org") or "unknown"
+    extra = ""
+    if data.get("socket_ip") and data.get("socket_ip") != data.get("ip"):
+        extra += f"Socket IP: {data.get('socket_ip')}\n"
+    if data.get("hostname"):
+        extra += f"Hostname: {data.get('hostname')}\n"
+    if data.get("note"):
+        extra += f"{data.get('note')}\n"
     console.print(
         Panel.fit(
             f"[bold red]ALERT[/bold red] Fake {data.get('type')} key "
-            f"[bold]{data.get('key_prefix')}[/bold] used by IP [bold]{data.get('ip')}[/bold]\n"
+            f"[bold]{data.get('key_prefix')}[/bold] used by "
+            f"public IP [bold]{data.get('ip')}[/bold]\n"
+            f"Location: {location}\n"
+            f"ISP / ASN: {isp} / {data.get('asn') or 'unknown'}\n"
+            f"{extra}"
             f"Time: {data.get('at')}\n"
             f"UA: {data.get('user_agent')}\n"
             f"Discord: {data.get('discord', 'n/a')}",
